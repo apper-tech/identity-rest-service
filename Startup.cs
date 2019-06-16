@@ -2,10 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using identity_rest_service.Data;
+using identity_rest_service.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -25,6 +29,20 @@ namespace identity_rest_service
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContextPool<AppDbContext>(opt =>
+            opt.UseSqlServer(Configuration.GetConnectionString("IdentityContext")));
+
+
+            services.AddIdentity<AppUser, AppRole>()
+            .AddEntityFrameworkStores<AppDbContext>();
+
+
+            services.Configure<IdentityOptions>(opt =>
+                {
+                    opt.User.RequireUniqueEmail = true;
+                }
+            );
+            services.AddScoped<IAuthRepository, AuthRepository>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
