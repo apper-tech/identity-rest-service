@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace identity_rest_service.Data
 {
-    public class AppDbContext : IdentityDbContext<AppUser>
+    public class AppDbContext : IdentityDbContext<AppUser, AppRole, Guid>
     {
         public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options)
@@ -23,8 +23,8 @@ namespace identity_rest_service.Data
 
             builder.Entity<UserProfile>()
             .HasOne(u => u.UserType)
-            .WithOne(i => i.UserProfile)
-            .HasForeignKey<UserProfile>(o => o.UserTypeID);
+            .WithMany(a => a.UserProfiles)
+            .HasForeignKey(p => p.UserTypeID);
 
             builder.Entity<UserProfile>()
             .HasOne(u => u.AgentProfile)

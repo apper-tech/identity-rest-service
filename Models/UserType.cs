@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -13,6 +14,6 @@ namespace identity_rest_service.Models
         public string Name { get; set; }
         public string Description { get; set; }
 
-        public UserProfile UserProfile { get; set; }
+        public ICollection<UserProfile> UserProfiles { get; set; }
     }
 }

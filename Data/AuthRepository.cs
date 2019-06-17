@@ -18,14 +18,26 @@ namespace identity_rest_service.Data
             _signManager = signManager;
         }
 
-        public async Task<AppUser> GetUserById(string id)
+        public async Task<AppUser> GetUserById(Guid id)
         {
-            return await this._userManager.FindByIdAsync(id);
+            var user = await this._userManager.Users
+             .Include(x => x.UserProfile)
+             .ThenInclude(a => a.UserType)
+             .Include(x => x.UserProfile)
+             .ThenInclude(a => a.AgentProfile)
+             .SingleAsync(x => x.Id == id);
+            return user;
         }
 
         public async Task<AppUser> GetUserByName(string name)
         {
-            return await this._userManager.FindByNameAsync(name);
+            var user = await this._userManager.Users
+            .Include(x => x.UserProfile)
+            .ThenInclude(a => a.UserType)
+            .Include(x => x.UserProfile)
+            .ThenInclude(a => a.AgentProfile)
+            .SingleAsync(x => x.UserName == name);
+            return user;
         }
 
         //future work for analytics API
@@ -35,13 +47,13 @@ namespace identity_rest_service.Data
             return await PagedList<AppUser>.CreateAsync(users, userParams.PageNumber, userParams.PageSize);
         }
 
-        public async Task<(SignInResult, AppUser)> Login(UserParams userParams)
+        public async Task<(SignInResult SignInResult, AppUser Data)> Login(UserParams userParams)
         {
             var result = await _signManager.PasswordSignInAsync(userParams.UserName,
                  userParams.Password, false, false);
 
-            return (result,
-                   result.Succeeded ? _userManager.FindByNameAsync(userParams.UserName).Result
+            return (SignInResult: result,
+                    Data: result.Succeeded ? await this.GetUserByName(userParams.UserName)
                    : null);
         }
         public async Task<IdentityResult> Register(UserParams userParams)

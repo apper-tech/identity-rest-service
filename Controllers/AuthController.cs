@@ -2,9 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using identity_rest_service.Data;
+using identity_rest_service.Dtos;
 using identity_rest_service.Helpers;
 using identity_rest_service.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace identity_rest_service.Controllers
@@ -14,10 +17,12 @@ namespace identity_rest_service.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthRepository _repo;
+        private readonly IMapper _mapper;
 
-        public AuthController(IAuthRepository repo)
+        public AuthController(IAuthRepository repo, IMapper mapper)
         {
             this._repo = repo;
+            this._mapper = mapper;
         }
 
         [HttpPost("register")]
@@ -28,16 +33,35 @@ namespace identity_rest_service.Controllers
             if (result.Succeeded)
             {
                 var user = await _repo.GetUserByName(userParams.UserName);
-                return Ok(("Sign Up Successful", user));
+                var response = new ResponseToReturnDto
+                {
+                    Result = "success",
+                    Data = _mapper.Map<UserToReturnDto>(user)
+                };
+                return Ok(response);
             }
             else
             {
-                string errorList = "";
-                foreach (var error in result.Errors)
+                return BadRequest(_mapper.Map<ErrorToReturnDto>(IdentityErrors.HandleErrors(result.Errors)));
+            }
+        }
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] UserParams userParams)
+        {
+            var result = await _repo.Login(userParams);
+
+            if (result.SignInResult.Succeeded)
+            {
+                var response = new ResponseToReturnDto
                 {
-                    errorList += error.Code + "\n";
-                }
-                return BadRequest(errorList);
+                    Result = "success",
+                    Data = _mapper.Map<UserToReturnDto>(result.Data)
+                };
+                return Ok(response);
+            }
+            else
+            {
+                return BadRequest(_mapper.Map<ErrorToReturnDto>(IdentityErrors.HandleErrors(result.SignInResult)));
             }
         }
         [HttpPost("getNewName")]
@@ -46,7 +70,7 @@ namespace identity_rest_service.Controllers
             var userName = userParams.FirstName.ToLower() + userParams.LastName.ToLower();
             while (await _repo.GetUserByName(userName) != null)
             {
-                userName += userName + (new Random()).Next(1, 999);
+                userName = userName + (new Random()).Next(1, 999).ToString()[0];
             }
             return Ok(userName);
         }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using identity_rest_service.Data;
 using identity_rest_service.Models;
 using Microsoft.AspNetCore.Builder;
@@ -43,6 +44,7 @@ namespace identity_rest_service
                 }
             );
             services.AddScoped<IAuthRepository, AuthRepository>();
+            services.AddAutoMapper(typeof(Startup));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 

@@ -10,7 +10,7 @@ using identity_rest_service.Data;
 namespace identity_rest_service.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20190616155209_Add User Profile")]
+    [Migration("20190617112718_AddUserProfile")]
     partial class AddUserProfile
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -21,31 +21,7 @@ namespace identity_rest_service.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken();
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(256);
-
-                    b.Property<string>("NormalizedName")
-                        .HasMaxLength(256);
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedName")
-                        .IsUnique()
-                        .HasName("RoleNameIndex")
-                        .HasFilter("[NormalizedName] IS NOT NULL");
-
-                    b.ToTable("AspNetRoles");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -55,8 +31,7 @@ namespace identity_rest_service.Migrations
 
                     b.Property<string>("ClaimValue");
 
-                    b.Property<string>("RoleId")
-                        .IsRequired();
+                    b.Property<Guid>("RoleId");
 
                     b.HasKey("Id");
 
@@ -65,7 +40,7 @@ namespace identity_rest_service.Migrations
                     b.ToTable("AspNetRoleClaims");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -75,8 +50,7 @@ namespace identity_rest_service.Migrations
 
                     b.Property<string>("ClaimValue");
 
-                    b.Property<string>("UserId")
-                        .IsRequired();
+                    b.Property<Guid>("UserId");
 
                     b.HasKey("Id");
 
@@ -85,7 +59,7 @@ namespace identity_rest_service.Migrations
                     b.ToTable("AspNetUserClaims");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
                     b.Property<string>("LoginProvider");
 
@@ -93,8 +67,7 @@ namespace identity_rest_service.Migrations
 
                     b.Property<string>("ProviderDisplayName");
 
-                    b.Property<string>("UserId")
-                        .IsRequired();
+                    b.Property<Guid>("UserId");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
@@ -103,11 +76,11 @@ namespace identity_rest_service.Migrations
                     b.ToTable("AspNetUserLogins");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
                 {
-                    b.Property<string>("UserId");
+                    b.Property<Guid>("UserId");
 
-                    b.Property<string>("RoleId");
+                    b.Property<Guid>("RoleId");
 
                     b.HasKey("UserId", "RoleId");
 
@@ -116,9 +89,9 @@ namespace identity_rest_service.Migrations
                     b.ToTable("AspNetUserRoles");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
-                    b.Property<string>("UserId");
+                    b.Property<Guid>("UserId");
 
                     b.Property<string>("LoginProvider");
 
@@ -151,9 +124,33 @@ namespace identity_rest_service.Migrations
                     b.ToTable("AgentProfile");
                 });
 
+            modelBuilder.Entity("identity_rest_service.Models.AppRole", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken();
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256);
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasName("RoleNameIndex")
+                        .HasFilter("[NormalizedName] IS NOT NULL");
+
+                    b.ToTable("AspNetRoles");
+                });
+
             modelBuilder.Entity("identity_rest_service.Models.AppUser", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<int>("AccessFailedCount");
@@ -218,7 +215,7 @@ namespace identity_rest_service.Migrations
                     b.Property<string>("Address")
                         .IsRequired();
 
-                    b.Property<int>("AgentProfileID");
+                    b.Property<int?>("AgentProfileID");
 
                     b.Property<string>("FirstName")
                         .IsRequired();
@@ -231,10 +228,10 @@ namespace identity_rest_service.Migrations
                     b.HasKey("ID");
 
                     b.HasIndex("AgentProfileID")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[AgentProfileID] IS NOT NULL");
 
-                    b.HasIndex("UserTypeID")
-                        .IsUnique();
+                    b.HasIndex("UserTypeID");
 
                     b.ToTable("UserProfile");
                 });
@@ -255,15 +252,15 @@ namespace identity_rest_service.Migrations
                     b.ToTable("UserType");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole")
+                    b.HasOne("identity_rest_service.Models.AppRole")
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
                     b.HasOne("identity_rest_service.Models.AppUser")
                         .WithMany()
@@ -271,7 +268,7 @@ namespace identity_rest_service.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
                     b.HasOne("identity_rest_service.Models.AppUser")
                         .WithMany()
@@ -279,9 +276,9 @@ namespace identity_rest_service.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole")
+                    b.HasOne("identity_rest_service.Models.AppRole")
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -292,7 +289,7 @@ namespace identity_rest_service.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
                     b.HasOne("identity_rest_service.Models.AppUser")
                         .WithMany()
@@ -312,12 +309,11 @@ namespace identity_rest_service.Migrations
                 {
                     b.HasOne("identity_rest_service.Models.AgentProfile", "AgentProfile")
                         .WithOne("UserProfile")
-                        .HasForeignKey("identity_rest_service.Models.UserProfile", "AgentProfileID")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("identity_rest_service.Models.UserProfile", "AgentProfileID");
 
                     b.HasOne("identity_rest_service.Models.UserType", "UserType")
-                        .WithOne("UserProfile")
-                        .HasForeignKey("identity_rest_service.Models.UserProfile", "UserTypeID")
+                        .WithMany("UserProfiles")
+                        .HasForeignKey("UserTypeID")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618

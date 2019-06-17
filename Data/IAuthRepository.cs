@@ -11,10 +11,10 @@ namespace identity_rest_service.Data
     {
         Task<PagedList<AppUser>> GetUsers(UserParams userParams);
         Task<IdentityResult> Register(UserParams userParams);
-        Task<(SignInResult, AppUser)> Login(UserParams userParams);
+        Task<(SignInResult SignInResult, AppUser Data)> Login(UserParams userParams);
         Task<bool> UserExists(UserParams userParams);
-        Task<AppUser> GetUserById(string id);
+        Task<AppUser> GetUserById(Guid id);
         Task<AppUser> GetUserByName(string name);
-        
+
     }
 }
